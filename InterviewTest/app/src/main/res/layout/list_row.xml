@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/comments"
+                android:textStyle="bold"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_margin="7dp"
+                android:textColor="@android:color/black"/>
+
+        <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="7dp"
+                android:id="@+id/top_container"
+                android:orientation="horizontal"
+                android:layout_below="@id/comments">
+
+                <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/thumbail"
+                        android:layout_marginRight="7dp"/>
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/list_text"
+                        android:textSize="17dp"
+                        android:textColor="@android:color/black"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="7dp"
+                android:id="@+id/bottom_cointainer"
+                android:orientation="horizontal"
+                android:layout_below="@id/top_container">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/list_author"
+                        android:textSize="17dp"
+                        android:textColor="@android:color/black"
+                        android:textStyle="bold"
+                        android:layout_marginRight="7dp"/>
+
+                <TextView
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/list_hours"
+                        android:textSize="17dp"
+                        android:textColor="@android:color/black"
+                        android:textStyle="italic"
+                        android:gravity="right"/>
+
+        </LinearLayout>
+
+</RelativeLayout>
