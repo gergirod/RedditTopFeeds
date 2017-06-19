@@ -1,8 +1,8 @@
 package germangirod.devigettest.data.api;
 
 import germangirod.devigettest.data.model.TopListing;
-import retrofit.http.GET;
-import retrofit.http.Query;
+import retrofit2.http.GET;
+import retrofit2.http.Query;
 import rx.Observable;
 
 /**

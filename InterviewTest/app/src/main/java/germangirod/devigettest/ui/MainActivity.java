@@ -9,34 +9,47 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import germangirod.devigettest.R;
 import germangirod.devigettest.data.model.Children;
-import germangirod.devigettest.data.presenters.TopData;
-import germangirod.devigettest.data.presenters.TopPresenter;
+import germangirod.devigettest.data.presenters.TopListinsDataInteractorImpl;
+import germangirod.devigettest.data.presenters.TopNewsPresenterImpl;
 import germangirod.devigettest.ui.adapter.ListAdapter;
 import germangirod.devigettest.ui.util.EndlessScrollListener;
 import germangirod.devigettest.util.ImageSaverTask;
 import java.util.List;
 import org.parceler.Parcels;
 
-public class MainActivity extends Activity implements ListAdapter.OnItemClickListener, TopPresenter {
+import static germangirod.devigettest.util.Constants.SAVESTATE_AFTER_RESPONSE;
+import static germangirod.devigettest.util.Constants.SAVESTATE_TOP_RESPONSE;
 
-    private static final String SAVESTATE_TOP_RESPONSE = "top_response";
-    private static final String SAVESTATE_AFTER_RESPONSE = "after";
-    @InjectView(R.id.top_list) ListView listView;
-    @InjectView(R.id.loading) ProgressBar loading;
+public class MainActivity extends Activity implements ListAdapter.OnItemClickListener {
+
+    @BindView(R.id.top_list) ListView listView;
+    public @BindView(R.id.loading) ProgressBar loading;
     int totalItems = 0;
-    String afters = "";
+    public String afters = "";
     private ListAdapter listAdapter;
-    private List<Children> childrenList;
+    public List<Children> childrenList;
+    private TopNewsPresenterImpl topNewsPresenter;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
+        topNewsPresenter = new TopNewsPresenterImpl(this, new TopListinsDataInteractorImpl(), String.valueOf(totalItems), afters);
+        setListView();
 
+        if (savedInstanceState != null) {
+            topNewsPresenter.onRestoreData(savedInstanceState);
+        } else {
+            getListItems();
+        }
+    }
+
+    private void setListView(){
         listAdapter = new ListAdapter(getApplicationContext());
 
         listAdapter.setOnItemClickListener(this);
@@ -45,28 +58,18 @@ public class MainActivity extends Activity implements ListAdapter.OnItemClickLis
             @Override public boolean onLoadMore(int page, int totalItemsCount) {
 
                 totalItems += 10;
-                getListItems();
+                topNewsPresenter.showProgress();
+                topNewsPresenter.onLoadMore(String.valueOf(totalItemsCount),afters);
                 return true;
             }
         });
 
         listView.setAdapter(listAdapter);
-        if (savedInstanceState != null) {
-
-            childrenList = Parcels.unwrap(savedInstanceState.getParcelable(SAVESTATE_TOP_RESPONSE));
-            afters = savedInstanceState.getString(SAVESTATE_AFTER_RESPONSE);
-            getTopNews(childrenList, afters);
-        } else {
-
-            getListItems();
-        }
     }
 
     public void getListItems() {
-        loading.setVisibility(View.VISIBLE);
-        TopData topData = new TopData();
-        topData.setView(this);
-        topData.getTopNews(String.valueOf(totalItems), afters);
+        topNewsPresenter.showProgress();
+        topNewsPresenter.onActivityCreated();
     }
 
     @Override protected void onSaveInstanceState(Bundle outState) {
@@ -108,18 +111,20 @@ public class MainActivity extends Activity implements ListAdapter.OnItemClickLis
         new ImageSaverTask(getApplication()).execute(url);
     }
 
-    @Override public void getTopNews(List<Children> childrens, String after) {
+
+    public void presentDataOnList(List<Children> childrens, String after){
+        topNewsPresenter.hideProgress();
         afters = after;
         if (totalItems < 10) {
             listAdapter.swapData(childrens);
         } else {
             listAdapter.addData(childrens);
         }
-
-        loading.setVisibility(View.GONE);
     }
 
-    @Override public void getTopNewsError(Throwable throwable) {
-        loading.setVisibility(View.GONE);
+    public void showError(String errorMessage){
+
+        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+
     }
 }
